@@ -38,6 +38,12 @@ struct ContentView: View {
                             Label("Zoom In", systemImage: "plus.magnifyingglass")
                         }
                     }
+                    ToolbarItemGroup(placement: .keyboard) {
+                        Spacer()
+                        Button("Done") {
+                            UIApplication.shared.endEditing()
+                        }
+                    }
                 }
                 .sheet(isPresented: $isShowingImagePicker) {
                     ImagePicker(image: $selectedUIImage)
