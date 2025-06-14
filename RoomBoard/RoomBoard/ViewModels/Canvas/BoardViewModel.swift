@@ -113,4 +113,19 @@ final class BoardViewModel: ObservableObject {
     func zoomOut() {
         canvasScale /= 1.2
     }
+
+    // MARK: - Content Updates
+    func setNoteText(id: UUID, text: String) {
+        guard let idx = elements.firstIndex(where: { $0.id == id }) else { return }
+        guard var note = elements[idx] as? StickyNoteModel else { return }
+        note.text = text
+        elements[idx] = note
+    }
+
+    func setTodoItems(id: UUID, items: [TodoItem]) {
+        guard let idx = elements.firstIndex(where: { $0.id == id }) else { return }
+        guard var list = elements[idx] as? TodoListModel else { return }
+        list.items = items
+        elements[idx] = list
+    }
 } 

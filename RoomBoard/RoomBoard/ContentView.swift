@@ -15,6 +15,7 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             CanvasView(viewModel: boardVM)
+                .environmentObject(boardVM)
                 .navigationTitle("RoomBoard")
                 .toolbar {
                     ToolbarItemGroup(placement: .bottomBar) {

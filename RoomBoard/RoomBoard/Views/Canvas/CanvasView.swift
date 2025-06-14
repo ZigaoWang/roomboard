@@ -87,11 +87,13 @@ struct CanvasView: View {
         switch element.kind {
         case .stickyNote:
             if let note = element as? StickyNoteModel {
-                StickyNoteView(model: note)
+                StickyNoteView(note: note)
+                    .environmentObject(viewModel)
             }
         case .todoList:
             if let list = element as? TodoListModel {
-                TodoListView(model: list)
+                TodoListView(list: list)
+                    .environmentObject(viewModel)
             }
         case .image:
             if let img = element as? ImageElementModel {

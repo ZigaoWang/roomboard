@@ -1,11 +1,18 @@
 import SwiftUI
 
 struct TodoListView: View {
-    @State var model: TodoListModel
+    @EnvironmentObject private var viewModel: BoardViewModel
+    let list: TodoListModel
+    @State private var items: [TodoItem]
+
+    init(list: TodoListModel) {
+        self.list = list
+        _items = State(initialValue: list.items)
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            ForEach($model.items) { $item in
+            ForEach($items) { $item in
                 HStack {
                     Button(action: { item.isDone.toggle() }) {
                         Image(systemName: item.isDone ? "checkmark.circle.fill" : "circle")
@@ -27,9 +34,12 @@ struct TodoListView: View {
                 .fill(Color(UIColor.secondarySystemBackground))
         )
         .shadow(radius: 4)
+        .onChange(of: items) { newItems in
+            viewModel.setTodoItems(id: list.id, items: newItems)
+        }
     }
 
     private func addItem() {
-        model.items.append(TodoItem(title: "New Item"))
+        items.append(TodoItem(title: "New Item"))
     }
 } 

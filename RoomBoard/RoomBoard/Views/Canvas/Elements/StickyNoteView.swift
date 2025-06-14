@@ -1,7 +1,14 @@
 import SwiftUI
 
 struct StickyNoteView: View {
-    @State var model: StickyNoteModel
+    @EnvironmentObject private var viewModel: BoardViewModel
+    let note: StickyNoteModel
+    @State private var text: String
+
+    init(note: StickyNoteModel) {
+        self.note = note
+        _text = State(initialValue: note.text)
+    }
 
     var body: some View {
         ZStack {
@@ -9,10 +16,13 @@ struct StickyNoteView: View {
                 .fill(Color.yellow.opacity(0.9))
                 .shadow(radius: 4)
 
-            TextEditor(text: $model.text)
+            TextEditor(text: $text)
                 .padding(8)
                 .background(Color.clear)
                 .font(.system(size: 16, weight: .regular, design: .rounded))
+                .onChange(of: text) { newVal in
+                    viewModel.setNoteText(id: note.id, text: newVal)
+                }
         }
     }
 } 
