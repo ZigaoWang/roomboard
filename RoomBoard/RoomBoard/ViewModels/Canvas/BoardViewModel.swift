@@ -4,11 +4,25 @@ import Combine
 final class BoardViewModel: ObservableObject {
 
     // MARK: - Published Properties
-    @Published private(set) var elements: [any BoardElement] = []
+    @Published private(set) var elements: [any BoardElement] = [] {
+        didSet {
+            persistence.save(elements: elements)
+        }
+    }
 
     // Canvas transform – allows panning and zooming on the board level
-    @Published var canvasScale: CGFloat = 1.0
-    @Published var canvasOffset: CGSize = .zero
+    @Published var canvasScale: CGFloat = 1.0 {
+        didSet { persistence.save(elements: elements) }
+    }
+    @Published var canvasOffset: CGSize = .zero {
+        didSet { persistence.save(elements: elements) }
+    }
+
+    private let persistence = BoardPersistence()
+
+    init() {
+        elements = persistence.load()
+    }
 
     // MARK: - Intents
     func addStickyNote() {
