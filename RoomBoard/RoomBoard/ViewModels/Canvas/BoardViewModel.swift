@@ -18,9 +18,6 @@ final class BoardViewModel: ObservableObject {
         didSet { persistence.save(elements: elements) }
     }
 
-    // Selected element for showing resize handles etc.
-    @Published var selectedElementID: UUID?
-
     private let persistence = BoardPersistence()
 
     init() {
@@ -105,52 +102,6 @@ final class BoardViewModel: ObservableObject {
             img.size.height *= scale
             elements[idx] = img
         default: break
-        }
-    }
-
-    // Resize by delta keeping top-left fixed
-    func resizeElement(id: UUID, by delta: CGSize, anchor: ResizeAnchor) {
-        guard let idx = elements.firstIndex(where: { $0.id == id }) else { return }
-        func applyResize(size: inout CGSize, position: inout CGPoint) {
-            var dWidth: CGFloat = 0
-            var dHeight: CGFloat = 0
-            switch anchor {
-            case .bottomRight:
-                dWidth = delta.width; dHeight = delta.height
-                // center shift
-                position.x += delta.width/2; position.y += delta.height/2
-            case .topLeft:
-                dWidth = -delta.width; dHeight = -delta.height
-                position.x += delta.width/2; position.y += delta.height/2
-            case .topRight:
-                dWidth = delta.width; dHeight = -delta.height
-                position.x += delta.width/2; position.y += delta.height/2
-            case .bottomLeft:
-                dWidth = -delta.width; dHeight = delta.height
-                position.x += delta.width/2; position.y += delta.height/2
-            }
-            size.width = max(60, size.width + dWidth)
-            size.height = max(60, size.height + dHeight)
-        }
-
-        switch elements[idx] {
-        case var note as StickyNoteModel:
-            var pos = note.position; var sz = note.size
-            applyResize(size: &sz, position: &pos)
-            note.size = sz; note.position = pos
-            elements[idx] = note
-        case var list as TodoListModel:
-            var pos = list.position; var sz = list.size
-            applyResize(size: &sz, position: &pos)
-            list.size = sz; list.position = pos
-            elements[idx] = list
-        case var img as ImageElementModel:
-            var pos = img.position; var sz = img.size
-            applyResize(size: &sz, position: &pos)
-            img.size = sz; img.position = pos
-            elements[idx] = img
-        default:
-            break
         }
     }
 

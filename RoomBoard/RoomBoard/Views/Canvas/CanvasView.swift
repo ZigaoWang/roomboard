@@ -1,5 +1,4 @@
 import SwiftUI
-// ResizeHandle is declared in same module
 
 struct CanvasView: View {
     @ObservedObject var viewModel: BoardViewModel
@@ -11,8 +10,6 @@ struct CanvasView: View {
     // Keeps track of last drag translation per element so we can apply only the delta each update.
     @State private var lastDragTranslation: [UUID: CGSize] = [:]
 
-    let handleSize: CGFloat = 14
-
     var body: some View {
         GeometryReader { geo in
             ZStack {
@@ -21,34 +18,11 @@ struct CanvasView: View {
                     .ignoresSafeArea()
 
                 ForEach(Array(viewModel.elements.enumerated()), id: \.offset) { index, element in
-                    let isSelected = viewModel.selectedElementID == element.id
                     elementView(for: element)
-                        .frame(width: element.size.width, height: element.size.height)
-                        .gesture(elementGesture(element))
-                        .onTapGesture {
-                            viewModel.selectedElementID = element.id
-                        }
-                        .if(isSelected) { view in
-                            view
-                                .overlay(
-                                    ResizeHandle(size: handleSize, anchor: .topLeft) { delta in
-                                        viewModel.resizeElement(id: element.id, by: delta, anchor: .topLeft)
-                                    }, alignment: .topLeading)
-                                .overlay(
-                                    ResizeHandle(size: handleSize, anchor: .topRight) { delta in
-                                        viewModel.resizeElement(id: element.id, by: delta, anchor: .topRight)
-                                    }, alignment: .topTrailing)
-                                .overlay(
-                                    ResizeHandle(size: handleSize, anchor: .bottomLeft) { delta in
-                                        viewModel.resizeElement(id: element.id, by: delta, anchor: .bottomLeft)
-                                    }, alignment: .bottomLeading)
-                                .overlay(
-                                    ResizeHandle(size: handleSize, anchor: .bottomRight) { delta in
-                                        viewModel.resizeElement(id: element.id, by: delta, anchor: .bottomRight)
-                                    }, alignment: .bottomTrailing)
-                        }
-                        .rotationEffect(element.angle)
                         .position(element.position)
+                        .frame(width: element.size.width, height: element.size.height)
+                        .rotationEffect(element.angle)
+                        .gesture(elementGesture(element))
                 }
             }
             .scaleEffect(viewModel.canvasScale * magnifyBy)
@@ -125,17 +99,6 @@ struct CanvasView: View {
             if let img = element as? ImageElementModel {
                 ImageElementView(model: img)
             }
-        }
-    }
-}
-
-private extension View {
-    @ViewBuilder
-    func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
-        if condition {
-            transform(self)
-        } else {
-            self
         }
     }
 } 
