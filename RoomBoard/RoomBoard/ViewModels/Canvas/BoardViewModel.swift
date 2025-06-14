@@ -20,23 +20,33 @@ final class BoardViewModel: ObservableObject {
 
     private let persistence = BoardPersistence()
 
+    private static let titleFormatter: DateFormatter = {
+        let df = DateFormatter()
+        df.dateStyle = .short
+        df.timeStyle = .short
+        return df
+    }()
+
     init() {
         elements = persistence.load()
     }
 
     // MARK: - Intents
     func addStickyNote() {
-        let note = StickyNoteModel()
+        var note = StickyNoteModel()
+        note.title = Self.titleFormatter.string(from: Date())
         elements.append(note)
     }
 
     func addTodoList() {
-        let list = TodoListModel()
+        var list = TodoListModel()
+        list.title = Self.titleFormatter.string(from: Date())
         elements.append(list)
     }
 
     func addImage(_ image: UIImage) {
         var imageModel = ImageElementModel()
+        imageModel.title = Self.titleFormatter.string(from: Date())
         imageModel.uiImage = image
         elements.append(imageModel)
     }
