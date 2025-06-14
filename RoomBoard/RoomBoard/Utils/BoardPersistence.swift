@@ -22,6 +22,9 @@ struct BoardPersistence {
         var text: String?
         var items: [PersistableTodoItem]?
         var imageFilename: String?
+
+        var title: String?
+        var style: BoardColor?
     }
 
     // MARK: - Public API
@@ -41,27 +44,35 @@ struct BoardPersistence {
                                           angleDegrees: element.angle.degrees,
                                           text: nil,
                                           items: nil,
-                                          imageFilename: nil)
+                                          imageFilename: nil,
+                                          title: nil,
+                                          style: nil)
             switch element.kind {
             case .stickyNote:
                 if let note = element as? StickyNoteModel {
                     base.text = note.text
+                    base.title = note.title
+                    base.style = note.style
                 }
             case .todoList:
                 if let list = element as? TodoListModel {
                     base.items = list.items.map { PersistableTodoItem(title: $0.title, isDone: $0.isDone) }
+                    base.title = list.title
+                    base.style = list.style
                 }
             case .image:
-                if let imgModel = element as? ImageElementModel,
-                   let uiImg = imgModel.uiImage {
-                    let filename = imgModel.id.uuidString + ".png"
-                    let imgURL = imageDirectory().appendingPathComponent(filename)
-                    if !FileManager.default.fileExists(atPath: imgURL.path) {
-                        if let data = uiImg.pngData() {
-                            try? data.write(to: imgURL)
+                if let imgModel = element as? ImageElementModel {
+                    base.title = imgModel.title
+                    if let uiImg = imgModel.uiImage {
+                        let filename = imgModel.id.uuidString + ".png"
+                        let imgURL = imageDirectory().appendingPathComponent(filename)
+                        if !FileManager.default.fileExists(atPath: imgURL.path) {
+                            if let data = uiImg.pngData() {
+                                try? data.write(to: imgURL)
+                            }
                         }
+                        base.imageFilename = filename
                     }
-                    base.imageFilename = filename
                 }
             }
             return base
@@ -87,6 +98,8 @@ struct BoardPersistence {
                 note.size = CGSize(width: persistent.width, height: persistent.height)
                 note.angle = .degrees(persistent.angleDegrees)
                 note.text = persistent.text ?? ""
+                if let title = persistent.title { note.title = title }
+                if let style = persistent.style { note.style = style }
                 return note
             case .todoList:
                 var list = TodoListModel()
@@ -97,6 +110,8 @@ struct BoardPersistence {
                 if let items = persistent.items {
                     list.items = items.map { TodoItem(title: $0.title, isDone: $0.isDone) }
                 }
+                if let title = persistent.title { list.title = title }
+                if let style = persistent.style { list.style = style }
                 return list
             case .image:
                 var img = ImageElementModel()
@@ -110,6 +125,7 @@ struct BoardPersistence {
                         img.uiImage = uiImg
                     }
                 }
+                if let title = persistent.title { img.title = title }
                 return img
             }
         }

@@ -98,6 +98,7 @@ struct CanvasView: View {
         case .image:
             if let img = element as? ImageElementModel {
                 ImageElementView(model: img)
+                    .environmentObject(viewModel)
             }
         }
     }

@@ -30,6 +30,21 @@ enum BoardElementKind: String, CaseIterable, Codable, Hashable {
     case image
 }
 
+// Board-wide color palette for sticky notes & lists
+enum BoardColor: String, CaseIterable, Codable, Hashable {
+    case yellow, orange, pink, blue, green
+
+    var swiftUIColor: Color {
+        switch self {
+        case .yellow: return Color.yellow.opacity(0.9)
+        case .orange: return Color.orange.opacity(0.9)
+        case .pink: return Color.pink.opacity(0.9)
+        case .blue: return Color.blue.opacity(0.9)
+        case .green: return Color.green.opacity(0.9)
+        }
+    }
+}
+
 // MARK: - Concrete Models
 
 struct StickyNoteModel: BoardElement {
@@ -38,7 +53,9 @@ struct StickyNoteModel: BoardElement {
     var size: CGSize = CGSize(width: 160, height: 160)
     var angle: Angle = .degrees(0)
 
+    var title: String = "Note"
     var text: String = "New Note"
+    var style: BoardColor = .yellow
 
     var kind: BoardElementKind { .stickyNote }
 }
@@ -55,7 +72,9 @@ struct TodoListModel: BoardElement {
     var size: CGSize = CGSize(width: 200, height: 220)
     var angle: Angle = .degrees(0)
 
+    var title: String = "List"
     var items: [TodoItem] = [TodoItem(title: "New Item")]
+    var style: BoardColor = .yellow
 
     var kind: BoardElementKind { .todoList }
 }
@@ -67,6 +86,8 @@ struct ImageElementModel: BoardElement, Hashable {
     var position: CGPoint = .zero
     var size: CGSize = CGSize(width: 240, height: 240)
     var angle: Angle = .degrees(0)
+
+    var title: String = "Image"
 
     // Because `UIImage` does not conform to `Codable`, we do not encode it.
     // In a shipping app, persist to file and store URL or AssetIdentifier.

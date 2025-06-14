@@ -128,4 +128,39 @@ final class BoardViewModel: ObservableObject {
         list.items = items
         elements[idx] = list
     }
+
+    // MARK: - Delete Element
+    func deleteElement(id: UUID) {
+        elements.removeAll { $0.id == id }
+    }
+
+    // MARK: - Title & Style
+    func setTitle(id: UUID, title: String) {
+        guard let idx = elements.firstIndex(where: { $0.id == id }) else { return }
+        switch elements[idx] {
+        case var note as StickyNoteModel:
+            note.title = title
+            elements[idx] = note
+        case var list as TodoListModel:
+            list.title = title
+            elements[idx] = list
+        case var img as ImageElementModel:
+            img.title = title
+            elements[idx] = img
+        default: break
+        }
+    }
+
+    func setStyle(id: UUID, style: BoardColor) {
+        guard let idx = elements.firstIndex(where: { $0.id == id }) else { return }
+        switch elements[idx] {
+        case var note as StickyNoteModel:
+            note.style = style
+            elements[idx] = note
+        case var list as TodoListModel:
+            list.style = style
+            elements[idx] = list
+        default: break
+        }
+    }
 } 
